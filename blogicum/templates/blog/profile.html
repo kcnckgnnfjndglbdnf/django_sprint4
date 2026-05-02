@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}
+  Страница пользователя {{ profile_user.username }}
+{% endblock %}
+
+{% block content %}
+  <h1 class="mb-5 text-center">Страница пользователя {{ profile_user.username }}</h1>
+
+  <small>
+    <ul class="list-group list-group-horizontal justify-content-center mb-3">
+      <li class="list-group-item text-muted">
+        Имя: {% if profile_user.first_name %}{{ profile_user.first_name }}{% else %}не указано{% endif %}
+      </li>
+      <li class="list-group-item text-muted">
+        Фамилия: {% if profile_user.last_name %}{{ profile_user.last_name }}{% else %}не указано{% endif %}
+      </li>
+      <li class="list-group-item text-muted">
+        Email: {% if profile_user.email %}{{ profile_user.email }}{% else %}не указан{% endif %}
+      </li>
+      <li class="list-group-item text-muted">
+        Регистрация: {{ profile_user.date_joined|date:"d.m.Y" }}
+      </li>
+      <li class="list-group-item text-muted">
+        Роль: {% if profile_user.is_staff %}Админ{% else %}Пользователь{% endif %}
+      </li>
+    </ul>
+
+    {% if user.is_authenticated and user.username == profile_user.username %}
+      <a href="{% url 'blog:profile_edit' profile_user.username %}">Редактировать профиль</a>
+      <br>
+      <a href="{% url 'password_change' %}">Изменить пароль</a>
+      <br>
+      <a href="{% url 'blog:post_create' %}">Создать новую публикацию</a>
+    {% endif %}
+  </small>
+  <br>
+
+  <h3 class="mb-5 text-center">Публикации пользователя</h3>
+
+  {% for post in page_obj %}
+    <article class="mb-5">
+      {% include "includes/post_card.html" %}
+    </article>
+  {% empty %}
+    <p class="text-center">У пользователя пока нет публикаций.</p>
+  {% endfor %}
+
+  {% include "includes/paginator.html" %}
+{% endblock %}

@@ -1,0 +1,57 @@
+{% if user.is_authenticated %}
+  {% load django_bootstrap5 %}
+  <h5 class="mb-4">Оставить комментарий</h5>
+  <form method="post" action="{% url 'blog:add_comment' post.id %}">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    {% bootstrap_button button_type="submit" content="Отправить" %}
+  </form>
+{% else %}
+  <div class="alert alert-info">
+    <a href="{% url 'login' %}">Войдите</a>, чтобы оставить комментарий.
+  </div>
+{% endif %}
+
+<br>
+
+{% for comment in comments %}
+  <div class="media mb-4" id="comment-{{ comment.id }}">
+    <div class="media-body">
+      <h5 class="mt-0">
+        <a href="{% url 'blog:profile' comment.author.username %}" name="comment_{{ comment.id }}">
+          @{{ comment.author.username }}
+        </a>
+      </h5>
+      <small class="text-muted">{{ comment.created_at|date:"d E Y, H:i" }}</small>
+      <br>
+      
+      {% if deleting_comment and deleting_comment.id == comment.id %}
+        <div class="alert alert-danger mt-3">
+          <p class="mb-2"><strong>Вы уверены, что хотите удалить этот комментарий?</strong></p>
+          <p class="text-muted">{{ comment.text|truncatewords:20 }}</p>
+          <form method="post" action="{% url 'blog:delete_comment' post.id comment.id %}" class="mt-2">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger btn-sm">Да, удалить</button>
+            <a href="{% url 'blog:post_detail' post.id %}" class="btn btn-secondary btn-sm">Отмена</a>
+          </form>
+        </div>
+      {% else %}
+        {{ comment.text|linebreaksbr }}
+      {% endif %}
+    </div>
+    
+    {% if user == comment.author and not deleting_comment %}
+      <div class="mt-2">
+        <a class="btn btn-sm text-muted" href="{% url 'blog:edit_comment' post.id comment.id %}" role="button">
+          Отредактировать
+        </a>
+        <a class="btn btn-sm text-danger" href="{% url 'blog:delete_comment' post.id comment.id %}" role="button">
+          Удалить
+        </a>
+      </div>
+    {% endif %}
+  </div>
+  {% if not forloop.last %}<hr>{% endif %}
+{% empty %}
+  <p class="text-muted">Пока нет комментариев. Будьте первым!</p>
+{% endfor %}
