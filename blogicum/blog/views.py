@@ -129,7 +129,6 @@ def profile_edit(request, username):
         messages.error(request, 'Вы можете редактировать только свой профиль!')
         return redirect('blog:profile', username=request.user.username)
 
-    # Выбираем форму
     if request.user.is_staff:
         from .forms import AdminProfileEditForm
         form = AdminProfileEditForm(instance=request.user)
@@ -146,24 +145,7 @@ def profile_edit(request, username):
         return redirect('blog:profile', username=request.user.username)
 
     return render(request, 'blog/user.html', {'form': form, 'user': request.user})
-'''
-@login_required
-def profile_edit(request, username):
-    if request.user.username != username:
-        messages.error(request, 'Вы можете редактировать только свой профиль!')
-        return redirect('blog:profile', username=request.user.username)
 
-    if request.method == 'POST':
-        form = ProfileEditForm(request.POST, instance=request.user)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Профиль успешно обновлён!')
-            return redirect('blog:profile', username=request.user.username)
-    else:
-        form = ProfileEditForm(instance=request.user)
-    
-    return render(request, 'blog/user.html', {'form': form})
-'''
 @login_required
 def post_create(request):
     if request.method == 'POST':
@@ -177,22 +159,6 @@ def post_create(request):
     else:
         form = PostForm()
     return render(request, 'blog/create.html', {'form': form})
-'''
-@login_required
-def post_create(request):
-    if request.method == 'POST':
-        form = PostForm(request.POST, request.FILES)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.save()
-            messages.success(request, 'Публикация успешно создана!')
-            return redirect('blog:profile', username=request.user.username)
-    else:
-        form = PostForm()
-
-    return render(request, 'blog/create.html', {'form': form})
-'''
 
 @login_required
 def post_edit(request, id):
@@ -215,7 +181,6 @@ def post_edit(request, id):
         form = PostForm(instance=post)
 
     return render(request, 'blog/create.html', {'form': form})
-
 
 @login_required
 def post_delete(request, id):
@@ -246,24 +211,6 @@ def add_comment(request, post_id):
         else:
             messages.error(request, 'Ошибка формы')
     return redirect('blog:post_detail', id=post_id)
-'''
-@login_required
-def add_comment(request, post_id):
-    post = get_object_or_404(Post, id=post_id)
-    
-    if request.method == 'POST':
-        form = CommentForm(request.POST)
-        if form.is_valid():
-            comment = form.save(commit=False)
-            comment.post = post
-            comment.author = request.user
-            comment.save()
-            messages.success(request, 'Комментарий успешно добавлен!')
-        else:
-            messages.error(request, 'Ошибка при добавлении комментария.')
-    
-    return redirect('blog:post_detail', id=post_id)
-'''
 
 @login_required
 def edit_comment(request, post_id, comment_id):
@@ -294,7 +241,6 @@ def edit_comment(request, post_id, comment_id):
         'form': form,
     }
     return render(request, 'blog/detail.html', context)
-
 
 @login_required
 def delete_comment(request, post_id, comment_id):

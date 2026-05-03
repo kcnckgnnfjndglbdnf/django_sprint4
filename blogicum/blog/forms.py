@@ -56,7 +56,6 @@ class ProfileEditForm(forms.ModelForm):
         }
 
 class AdminProfileEditForm(forms.ModelForm):
-    """Полная форма для администратора - все поля User"""
     class Meta:
         model = User
         fields = '__all__'
